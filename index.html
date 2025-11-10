@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Повышение квалификации — Личный кабинет преподавателя</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="page__header">
+      <h1>Личный кабинет преподавателя</h1>
+      <p class="page__subtitle">Учёт сведений о повышении квалификации</p>
+    </header>
+
+    <section class="filter">
+      <label class="filter__label" for="teacher-filter">Фильтр по преподавателю:</label>
+      <select id="teacher-filter" class="filter__select"></select>
+      <button id="add-record" class="button" type="button">Добавить запись</button>
+    </section>
+
+    <section class="table-section">
+      <div class="table-wrapper">
+        <table class="records-table">
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>ФИО</th>
+              <th>Должность</th>
+              <th>Место прохождения ПК</th>
+              <th>Период ПК</th>
+              <th>Форма ПК и количество часов</th>
+              <th>Тема обучения</th>
+              <th>Приказ о направлении</th>
+              <th>Отметка о сдаче копии удостоверения</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="records-body"></tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button id="save-records" class="button button--primary" type="button">Сохранить</button>
+        <span id="save-feedback" class="feedback" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+  </main>
+
+  <template id="record-row-template">
+    <tr>
+      <td class="records-table__index"></td>
+      <td>
+        <select class="input input--select record__teacher"></select>
+      </td>
+      <td>
+        <input class="input record__position" type="text" placeholder="Введите должность" />
+      </td>
+      <td>
+        <input class="input record__place" type="text" placeholder="Укажите место" />
+      </td>
+      <td class="record__period">
+        <label class="visually-hidden" aria-hidden="true">Дата начала</label>
+        <input class="input record__date-start" type="date" />
+        <span class="record__period-divider">—</span>
+        <label class="visually-hidden" aria-hidden="true">Дата окончания</label>
+        <input class="input record__date-end" type="date" />
+      </td>
+      <td>
+        <input class="input record__format" type="text" placeholder="Форма и часы" />
+      </td>
+      <td>
+        <input class="input record__topic" type="text" placeholder="Тема обучения" />
+      </td>
+      <td>
+        <input class="input record__order" type="text" placeholder="Номер и дата приказа" />
+      </td>
+      <td>
+        <input class="input record__certificate" type="text" placeholder="Отметка" />
+      </td>
+      <td>
+        <button class="button button--ghost record__delete" type="button" title="Удалить запись">✕</button>
+      </td>
+    </tr>
+  </template>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
