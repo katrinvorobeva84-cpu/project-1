@@ -1,88 +1,561 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Повышение квалификации — Личный кабинет преподавателя</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main class="page">
-    <header class="page__header">
-      <h1>Личный кабинет преподавателя</h1>
-      <p class="page__subtitle">Учёт сведений о повышении квалификации</p>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Личный кабинет преподавателя — Повышение квалификации</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        --page-bg: #f4f6fb;
+        --card-bg: #ffffff;
+        --primary: #3b82f6;
+        --primary-dark: #1d4ed8;
+        --border: #d6d9e0;
+        --border-strong: #b6bbc7;
+        --text-muted: #5b6472;
+        --danger: #ef4444;
+      }
 
-    <section class="filter">
-      <label class="filter__label" for="teacher-filter">Фильтр по преподавателю:</label>
-      <select id="teacher-filter" class="filter__select"></select>
-      <button id="add-record" class="button" type="button">Добавить запись</button>
-    </section>
+      * {
+        box-sizing: border-box;
+      }
 
-    <section class="table-section">
-      <div class="table-wrapper">
-        <table class="records-table">
-          <thead>
-            <tr>
-              <th>№</th>
-              <th>ФИО</th>
-              <th>Должность</th>
-              <th>Место прохождения ПК</th>
-              <th>Период ПК</th>
-              <th>Форма ПК и количество часов</th>
-              <th>Тема обучения</th>
-              <th>Приказ о направлении</th>
-              <th>Отметка о сдаче копии удостоверения</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="records-body"></tbody>
-        </table>
-      </div>
-      <div class="table-actions">
-        <button id="save-records" class="button button--primary" type="button">Сохранить</button>
-        <span id="save-feedback" class="feedback" role="status" aria-live="polite"></span>
-      </div>
-    </section>
-  </main>
+      body {
+        margin: 0;
+        background: var(--page-bg);
+        color: #1b1f27;
+      }
 
-  <template id="record-row-template">
-    <tr>
-      <td class="records-table__index"></td>
-      <td>
-        <select class="input input--select record__teacher"></select>
-      </td>
-      <td>
-        <input class="input record__position" type="text" placeholder="Введите должность" />
-      </td>
-      <td>
-        <input class="input record__place" type="text" placeholder="Укажите место" />
-      </td>
-      <td class="record__period">
-        <label class="visually-hidden" aria-hidden="true">Дата начала</label>
-        <input class="input record__date-start" type="date" />
-        <span class="record__period-divider">—</span>
-        <label class="visually-hidden" aria-hidden="true">Дата окончания</label>
-        <input class="input record__date-end" type="date" />
-      </td>
-      <td>
-        <input class="input record__format" type="text" placeholder="Форма и часы" />
-      </td>
-      <td>
-        <input class="input record__topic" type="text" placeholder="Тема обучения" />
-      </td>
-      <td>
-        <input class="input record__order" type="text" placeholder="Номер и дата приказа" />
-      </td>
-      <td>
-        <input class="input record__certificate" type="text" placeholder="Отметка" />
-      </td>
-      <td>
-        <button class="button button--ghost record__delete" type="button" title="Удалить запись">✕</button>
-      </td>
-    </tr>
-  </template>
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 24px 48px;
+      }
 
-  <script src="script.js" defer></script>
-</body>
+      header {
+        margin-bottom: 28px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        margin-top: 8px;
+        color: var(--text-muted);
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 18px;
+        box-shadow: 0 18px 45px -25px rgba(28, 38, 80, 0.35);
+        padding: 24px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: 600;
+      }
+
+      select,
+      input[type="text"],
+      input[type="date"] {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0 12px;
+        font: inherit;
+        background: #fff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      select:focus,
+      input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+      }
+
+      .select-inline {
+        width: min(320px, 100%);
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        border-radius: 10px;
+        padding: 0 18px;
+        min-height: 42px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      }
+
+      .button:active {
+        transform: translateY(1px);
+      }
+
+      .button--primary {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .button--primary:hover {
+        background: var(--primary-dark);
+      }
+
+      .button--secondary {
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--primary-dark);
+      }
+
+      .button--ghost {
+        background: transparent;
+        color: var(--danger);
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 960px;
+        background: #fff;
+      }
+
+      thead {
+        background: rgba(59, 130, 246, 0.1);
+      }
+
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th:first-child,
+      td:first-child {
+        width: 48px;
+        text-align: center;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table-empty {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 32px 12px;
+        font-weight: 500;
+      }
+
+      .period-inputs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+        gap: 8px;
+        align-items: center;
+      }
+
+      .period-inputs span {
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .table-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .feedback {
+        min-height: 24px;
+        font-weight: 600;
+        color: var(--primary-dark);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .feedback.is-visible {
+        opacity: 1;
+      }
+
+      .delete-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .page {
+          padding: 24px 16px 36px;
+        }
+
+        h1 {
+          font-size: 1.6rem;
+        }
+
+        .period-inputs {
+          grid-template-columns: 1fr;
+        }
+
+        table {
+          min-width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>Личный кабинет преподавателя</h1>
+        <p class="subtitle">Учёт сведений о повышении квалификации</p>
+      </header>
+
+      <section class="card">
+        <div class="toolbar">
+          <label class="select-inline" for="teacher-filter">Фильтр по преподавателю</label>
+          <select class="select-inline" id="teacher-filter"></select>
+          <button class="button button--secondary" id="add-record" type="button">Добавить запись</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>ФИО преподавателя</th>
+                <th>Должность</th>
+                <th>Место прохождения ПК</th>
+                <th>Период ПК</th>
+                <th>Форма ПК и количество часов</th>
+                <th>Тема обучения</th>
+                <th>Приказ о направлении</th>
+                <th>Отметка о сдаче копии удостоверения</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="records-body"></tbody>
+          </table>
+        </div>
+
+        <div class="table-actions">
+          <button class="button button--primary" id="save-records" type="button">Сохранить</button>
+          <span class="feedback" id="save-feedback" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+    </div>
+
+    <template id="row-template">
+      <tr>
+        <td class="row-index"></td>
+        <td>
+          <select class="teacher-select"></select>
+        </td>
+        <td>
+          <input class="position-input" type="text" placeholder="Должность" />
+        </td>
+        <td>
+          <input class="place-input" type="text" placeholder="Место прохождения" />
+        </td>
+        <td>
+          <div class="period-inputs">
+            <input class="start-date-input" type="date" aria-label="Дата начала" />
+            <span>—</span>
+            <input class="end-date-input" type="date" aria-label="Дата окончания" />
+          </div>
+        </td>
+        <td>
+          <input class="format-input" type="text" placeholder="Форма и часы" />
+        </td>
+        <td>
+          <input class="topic-input" type="text" placeholder="Тема обучения" />
+        </td>
+        <td>
+          <input class="order-input" type="text" placeholder="Номер и дата приказа" />
+        </td>
+        <td>
+          <input class="certificate-input" type="text" placeholder="Отметка" />
+        </td>
+        <td>
+          <button class="button button--ghost delete-button" type="button" title="Удалить запись">×</button>
+        </td>
+      </tr>
+    </template>
+
+    <script>
+      const staffMembers = [
+        { id: "t1", name: "Алексеев Иван Петрович", position: "Доцент кафедры математики" },
+        { id: "t2", name: "Волкова Мария Сергеевна", position: "Старший преподаватель кафедры информатики" },
+        { id: "t3", name: "Громов Алексей Николаевич", position: "Преподаватель кафедры иностранных языков" },
+        { id: "t4", name: "Дмитриева Ольга Викторовна", position: "Методист учебного отдела" }
+      ];
+
+      const STORAGE_KEY = "teacherQualificationRecords";
+
+      const state = {
+        records: loadRecords(),
+        filter: "all"
+      };
+
+      const elements = {
+        filterSelect: document.getElementById("teacher-filter"),
+        tableBody: document.getElementById("records-body"),
+        addButton: document.getElementById("add-record"),
+        saveButton: document.getElementById("save-records"),
+        feedback: document.getElementById("save-feedback"),
+        rowTemplate: document.getElementById("row-template")
+      };
+
+      initPage();
+
+      function initPage() {
+        populateFilter();
+        renderTable();
+
+        elements.filterSelect.addEventListener("change", handleFilterChange);
+        elements.addButton.addEventListener("click", handleAddRecord);
+        elements.saveButton.addEventListener("click", handleSaveRecords);
+      }
+
+      function populateFilter() {
+        elements.filterSelect.innerHTML = "";
+
+        const allOption = document.createElement("option");
+        allOption.value = "all";
+        allOption.textContent = "Все преподаватели";
+        elements.filterSelect.appendChild(allOption);
+
+        staffMembers.forEach((member) => {
+          const option = document.createElement("option");
+          option.value = member.id;
+          option.textContent = member.name;
+          elements.filterSelect.appendChild(option);
+        });
+
+        if (!state.filter || (state.filter !== "all" && !staffMembers.some((m) => m.id === state.filter))) {
+          state.filter = "all";
+        }
+
+        elements.filterSelect.value = state.filter;
+      }
+
+      function handleFilterChange(event) {
+        state.filter = event.target.value;
+        renderTable();
+      }
+
+      function handleAddRecord() {
+        const baseTeacherId = state.filter === "all" ? "" : state.filter;
+        const teacher = staffMembers.find((member) => member.id === baseTeacherId);
+
+        const newRecord = {
+          id: createId(),
+          teacherId: baseTeacherId,
+          position: teacher?.position ?? "",
+          place: "",
+          startDate: "",
+          endDate: "",
+          formatHours: "",
+          topic: "",
+          order: "",
+          certificate: ""
+        };
+
+        state.records.push(newRecord);
+        renderTable();
+      }
+
+      function handleSaveRecords() {
+        saveRecords(state.records);
+        showFeedback("Данные сохранены");
+      }
+
+      function renderTable() {
+        elements.tableBody.innerHTML = "";
+
+        const recordsToShow = state.filter === "all"
+          ? state.records
+          : state.records.filter((record) => record.teacherId === state.filter);
+
+        if (recordsToShow.length === 0) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 10;
+          cell.className = "table-empty";
+          cell.textContent = "Записей пока нет. Добавьте первую запись.";
+          row.appendChild(cell);
+          elements.tableBody.appendChild(row);
+          return;
+        }
+
+        recordsToShow.forEach((record, index) => {
+          const row = elements.rowTemplate.content.firstElementChild.cloneNode(true);
+          row.dataset.recordId = record.id;
+
+          row.querySelector(".row-index").textContent = index + 1;
+
+          const teacherSelect = row.querySelector(".teacher-select");
+          populateTeacherSelect(teacherSelect, record.teacherId);
+
+          const positionInput = row.querySelector(".position-input");
+          const placeInput = row.querySelector(".place-input");
+          const startDateInput = row.querySelector(".start-date-input");
+          const endDateInput = row.querySelector(".end-date-input");
+          const formatInput = row.querySelector(".format-input");
+          const topicInput = row.querySelector(".topic-input");
+          const orderInput = row.querySelector(".order-input");
+          const certificateInput = row.querySelector(".certificate-input");
+          const deleteButton = row.querySelector(".delete-button");
+
+          positionInput.value = record.position ?? "";
+          placeInput.value = record.place ?? "";
+          startDateInput.value = record.startDate ?? "";
+          endDateInput.value = record.endDate ?? "";
+          formatInput.value = record.formatHours ?? "";
+          topicInput.value = record.topic ?? "";
+          orderInput.value = record.order ?? "";
+          certificateInput.value = record.certificate ?? "";
+
+          positionInput.dataset.autoPosition = staffMembers.find((member) => member.id === record.teacherId)?.position ?? "";
+
+          teacherSelect.addEventListener("change", () => {
+            record.teacherId = teacherSelect.value;
+            const staff = staffMembers.find((member) => member.id === record.teacherId);
+            if (staff && (!positionInput.value || positionInput.value === positionInput.dataset.autoPosition)) {
+              positionInput.value = staff.position;
+              positionInput.dataset.autoPosition = staff.position;
+              record.position = staff.position;
+            }
+            renderTable();
+          });
+
+          positionInput.addEventListener("input", () => {
+            record.position = positionInput.value;
+          });
+
+          placeInput.addEventListener("input", () => {
+            record.place = placeInput.value;
+          });
+
+          startDateInput.addEventListener("change", () => {
+            record.startDate = startDateInput.value;
+          });
+
+          endDateInput.addEventListener("change", () => {
+            record.endDate = endDateInput.value;
+          });
+
+          formatInput.addEventListener("input", () => {
+            record.formatHours = formatInput.value;
+          });
+
+          topicInput.addEventListener("input", () => {
+            record.topic = topicInput.value;
+          });
+
+          orderInput.addEventListener("input", () => {
+            record.order = orderInput.value;
+          });
+
+          certificateInput.addEventListener("input", () => {
+            record.certificate = certificateInput.value;
+          });
+
+          deleteButton.addEventListener("click", () => {
+            deleteRecord(record.id);
+          });
+
+          elements.tableBody.appendChild(row);
+        });
+      }
+
+      function populateTeacherSelect(selectElement, selectedId) {
+        selectElement.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Выберите преподавателя";
+        selectElement.appendChild(defaultOption);
+
+        staffMembers.forEach((member) => {
+          const option = document.createElement("option");
+          option.value = member.id;
+          option.textContent = member.name;
+          selectElement.appendChild(option);
+        });
+
+        selectElement.value = selectedId ?? "";
+      }
+
+      function deleteRecord(recordId) {
+        state.records = state.records.filter((record) => record.id !== recordId);
+        renderTable();
+      }
+
+      function showFeedback(message) {
+        elements.feedback.textContent = message;
+        elements.feedback.classList.add("is-visible");
+        setTimeout(() => {
+          elements.feedback.classList.remove("is-visible");
+          elements.feedback.textContent = "";
+        }, 2500);
+      }
+
+      function saveRecords(records) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      }
+
+      function loadRecords() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            return [];
+          }
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.error("Не удалось загрузить данные", error);
+          return [];
+        }
+      }
+
+      function createId() {
+        return `rec-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+      }
+    </script>
+  </body>
 </html>
